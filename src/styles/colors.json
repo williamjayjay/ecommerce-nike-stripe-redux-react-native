@@ -1,0 +1,14 @@
+{
+    "primary": {
+        "500": "#272727"
+    },
+    "tertiary": {
+        "success": "#1FAD66",
+        "warning": "#EB5A52"
+    },
+    "base": {
+        "light": "#F2F2EF"
+    }
+   
+}
+
