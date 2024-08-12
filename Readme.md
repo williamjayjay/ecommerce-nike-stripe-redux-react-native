@@ -1,18 +1,18 @@
 <h1 align="center">E-Nike Mobile</h1>
 
 <p align="center">
-  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/williamjayjay/nike-app-clone">
+  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/williamjayjay/ecommerce-nike-stripe-redux-react-native">
 
-  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/williamjayjay/nike-app-clone" />
+  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/williamjayjay/ecommerce-nike-stripe-redux-react-native" />
 
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/williamjayjay/nike-app-clone">
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/williamjayjay/ecommerce-nike-stripe-redux-react-native">
   
   <a href="https://github.com/williamjayjay/Github-Blog/commits/master">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/williamjayjay/nike-app-clone">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/williamjayjay/ecommerce-nike-stripe-redux-react-native">
   </a>
     
-   <a href="https://github.com/williamjayjay/nike-app-clone/stargazers">
-    <img alt="Stargazers" src="https://img.shields.io/github/stars/williamjayjay/nike-app-clone?style=social">
+   <a href="https://github.com/williamjayjay/ecommerce-nike-stripe-redux-react-native/stargazers">
+    <img alt="Stargazers" src="https://img.shields.io/github/stars/williamjayjay/ecommerce-nike-stripe-redux-react-native?style=social">
   </a>
 </p>
 
@@ -56,10 +56,10 @@ Para garantir o funcionamento adequado da nossa aplicação, verifique abaixo:
 
 1. **Clone o repositório**:
   ```sh
-  git clone https://github.com/williamjayjay/nike-app-clone
+  git clone https://github.com/williamjayjay/ecommerce-nike-stripe-redux-react-native
   ```
 
-2. **Navegue na raiz do projeto nike-app-clone:**
+2. **Navegue na raiz do projeto ecommerce-nike-stripe-redux-react-native:**
 
 3. **Instale os módulos:**
   ```sh
