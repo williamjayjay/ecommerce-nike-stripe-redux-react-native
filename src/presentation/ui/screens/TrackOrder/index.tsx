@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   ActivityIndicator,
 } from 'react-native';
 
@@ -13,33 +12,21 @@ const TrackOrder = () => {
   const { data, isLoading, error } = useGetOrderQuery(ref);
 
   return (
-    <View style={styles.root}>
+    <View className='p-[10px]'>
       <TextInput
-        style={styles.input}
+      className='p-[10px] rounded-[5px] border border-gray-500'
         value={ref}
         onChangeText={setRef}
-        placeholder="Your order reference"
+        placeholder="Referência do seu pedido"
       />
 
       {isLoading && <ActivityIndicator />}
-      {data?.status !== 'OK' && <Text>Order not found</Text>}
+      {data?.status !== 'OK' && <Text className='font-karla400Regular text-gray-500 text-lg' >Pedido não encontrado</Text>}
       {data?.status === 'OK' && (
-        <Text>{JSON.stringify(data.data, null, 2)}</Text>
+        <Text className='font-karla500Medium text-primary-500 text-base' >{JSON.stringify(data.data, null, 2)}</Text>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    padding: 10,
-  },
-  input: {
-    borderColor: 'lightgrey',
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-  },
-});
 
 export  {TrackOrder};

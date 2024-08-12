@@ -1,18 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const baseUrl = 'http://192.168.1.109:3000/';
-
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_URL_STORE }),
   endpoints: (builder) => ({
+
     getProducts: builder.query({
       query: () => 'products',
     }),
+
     getProduct: builder.query({
       query: (id) => `products/${id}`,
     }),
-    // Orders
     createOrder: builder.mutation({
       query: (newOrder) => ({
         url: 'orders',
@@ -20,10 +19,10 @@ export const apiSlice = createApi({
         body: newOrder,
       }),
     }),
+    
     getOrder: builder.query({
       query: (ref) => `orders/${ref}`,
     }),
-    // Payments
     createPaymentIntent: builder.mutation({
       query: (data) => ({
         url: 'payments/intents',

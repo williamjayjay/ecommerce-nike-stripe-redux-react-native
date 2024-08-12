@@ -1,30 +1,23 @@
 import { useGetProductsQuery } from '@/@core/store/apiSlice';
-import { useNavigation } from '@react-navigation/native';
+import { SerializedError } from '@reduxjs/toolkit';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import {
-  StyleSheet,
   Text,
-  View,
   Image,
   FlatList,
-  Pressable,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-// import { productsSlice } from '../store/productsSlice';
-
-const ProductsScreen = ({ navigation }) => {
-  // const navigation = useNavigation();
-
-  const dispatch = useDispatch();
-
+const ProductsScreen = ({ navigation }: any) => {
   const { data, isLoading, error } = useGetProductsQuery({});
+  const hasError: FetchBaseQueryError | SerializedError | any = error
 
   if (isLoading) {
     return <ActivityIndicator />;
   }
 
-  if (error) {
-    return <Text>Error fetching products 2: {error.error}</Text>;
+  if (hasError) {
+    return <Text className='font-karla400Regular text-primary-500' >Erro ao buscar o produto 1: {hasError.error}</Text>;
   }
 
   const products = data.data;
@@ -33,32 +26,18 @@ const ProductsScreen = ({ navigation }) => {
     <FlatList
       data={products}
       renderItem={({ item }) => (
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
-            // update selected product
-            // dispatch(productsSlice.actions.setSelectedProduct(item.id));
-
             navigation.navigate("Detalhes", { id: item?._id });
           }}
-          style={styles.itemContainer}
+          className='w-[50%] p-1 '
         >
-          <Image source={{ uri: item.image }} style={styles.image} />
-        </Pressable>
+          <Image source={{ uri: item.image }} className='w-full aspect-square' />
+        </TouchableOpacity>
       )}
       numColumns={2}
     />
   );
 };
 
-const styles = StyleSheet.create({
-  itemContainer: {
-    width: '50%',
-    padding: 1,
-  },
-  image: {
-    width: '100%',
-    aspectRatio: 1,
-  },
-});
-
-export  {ProductsScreen};
+export { ProductsScreen };

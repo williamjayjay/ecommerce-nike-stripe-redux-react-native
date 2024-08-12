@@ -1,9 +1,10 @@
 // @ts-nocheck
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { InitialStateCartStateSlice, Product } from '../types/product';
 
-const initialState = {
+const initialState: InitialStateCartStateSlice = {
   items: [],
-  deliveryFee: 15,
+  deliveryFee: 10,
   freeDeliveryFrom: 200,
 };
 
@@ -11,19 +12,25 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addCartItem: (state, action) => {
+
+    addCartItem: (state, action: PayloadAction<{ product: Product }>) => {
+
       const newProduct = action.payload.product;
+
       const cartItem = state.items.find(
         (item) => item.product._id === newProduct._id
       );
+
       if (cartItem) {
         cartItem.quantity += 1;
       } else {
         state.items.push({ product: newProduct, quantity: 1 });
       }
     },
-    changeQuantity: (state, action) => {
+
+    changeQuantity: (state, action: PayloadAction<{ amount: Number; productId: string; }>) => {
       const { productId, amount } = action.payload;
+
       const cartItem = state.items.find(
         (item) => item.product._id === productId
       );

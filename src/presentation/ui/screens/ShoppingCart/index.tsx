@@ -2,8 +2,6 @@ import {
     Text,
     FlatList,
     View,
-    StyleSheet,
-    Pressable,
     ActivityIndicator,
     Alert,
 } from 'react-native';
@@ -12,31 +10,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useStripe } from '@stripe/stripe-react-native';
 import { useCreateOrderMutation, useCreatePaymentIntentMutation } from '@/@core/store/apiSlice';
 import { selectSubtotal, selectDeliveryPrice, selectTotal, cartSlice } from '@/@core/store/cartSlice';
-import {CartListItem} from '@/presentation/components/CartList';
+import { CartListItem } from '@/presentation/ui/components/CartList';
 import { TouchableOpacity } from 'react-native';
-
-const ShoppingCartTotals = () => {
-    const subtotal = useSelector(selectSubtotal);
-    const deliveryFee = useSelector(selectDeliveryPrice);
-    const total = useSelector(selectTotal);
-
-    return (
-        <View style={styles.totalsContainer}>
-            <View style={styles.row}>
-                <Text style={styles.text}>Subtotal</Text>
-                <Text style={styles.text}>{subtotal} US$</Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={styles.text}>Delivery</Text>
-                <Text style={styles.text}>{deliveryFee} US$</Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={styles.textBold}>Total</Text>
-                <Text style={styles.textBold}>{total} US$</Text>
-            </View>
-        </View>
-    );
-};
+import { SerializedError } from '@reduxjs/toolkit';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import Toast from 'react-native-toast-message';
+import { useState } from 'react';
+import classNames from 'classnames';
+import colors from '@/presentation/ui/styles/colors.json'
+import { AppState } from './types';
+import { ShoppingCartTotals } from '@/presentation/ui/components/ShoppingCartTotals';
 
 const ShoppingCart = () => {
     const subtotal = useSelector(selectSubtotal);
@@ -44,28 +27,28 @@ const ShoppingCart = () => {
     const total = useSelector(selectTotal);
     const dispatch = useDispatch();
 
-    const cartItems = useSelector((state) => state.cart.items);
+    const [isLoadingLocal, setIsLoadingLocal] = useState(false);
 
-    const [createOrder, { data, error, isLoading }] = useCreateOrderMutation();
+    const cartItems = useSelector((state: AppState) => state.cart.items);
+
+    const [createOrder, { isLoading }] = useCreateOrderMutation();
 
     const [createPaymentIntent] = useCreatePaymentIntentMutation();
 
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
     const onCheckout = async () => {
+        setIsLoadingLocal(true)
         // 1. Create a payment intent
         const response = await createPaymentIntent({
             amount: Math.floor(total * 100),
-        });
-
-        console.log('1response' , response)
+        }) as { data: any; error: FetchBaseQueryError | SerializedError | any }
 
         if (response?.error) {
-            Alert.alert('Something went wrong');
+            Alert.alert('Ocorreu um erro.');
+            setIsLoadingLocal(false)
             return;
         }
-
-        console.log('1.1 --', response?.data?.paymentIntent)
 
         // 2. Initialize the Payment sheet
         const initResponse = await initPaymentSheet({
@@ -74,24 +57,21 @@ const ShoppingCart = () => {
 
         });
 
-        console.log('2initResponse' , initResponse)
-
-
         if (initResponse.error) {
             console.log(initResponse.error);
-            Alert.alert('Something went wrong');
+            Alert.alert('Ocorreu um erro.');
+            setIsLoadingLocal(false)
             return;
         }
 
         // 3. Present the Payment Sheet from Stripe
         const paymentResponse = await presentPaymentSheet();
 
-        console.log('paymentResponse',paymentResponse)
-
         if (paymentResponse?.error) {
+            setIsLoadingLocal(false)
             Alert.alert(
-                `Error code: ${paymentResponse?.error?.code}`,
-                paymentResponse?.error?.message
+                "Pagamento cancelado",
+                "O fluxo de pagamento foi interrompido."
             );
             return;
         }
@@ -111,15 +91,19 @@ const ShoppingCart = () => {
                 address: 'My home',
                 email: 'vadim@notjust.dev',
             },
-        });
+        }) as { data: any; error: FetchBaseQueryError | SerializedError | any }
 
         if (result.data?.status === 'OK') {
-            Alert.alert(
-                'Order has been submitted',
-                `Your order reference is: ${result.data.data.ref}`
-            );
+            setIsLoadingLocal(false)
+            Toast.show({
+                type: 'success',
+                text1: `Pedido ${result.data.data.ref} realizado com sucesso!`,
+            });
             dispatch(cartSlice.actions.clear());
         }
+
+        setIsLoadingLocal(false)
+
     };
 
     return (
@@ -129,52 +113,25 @@ const ShoppingCart = () => {
                 renderItem={({ item }) => <CartListItem cartItem={item} />}
                 ListFooterComponent={ShoppingCartTotals}
             />
-            <TouchableOpacity onPress={() => onCheckout()} style={styles.button}>
-                <Text style={styles.buttonText}>
-                    Checkout
-                    {isLoading && <ActivityIndicator />}
-                </Text>
+            <View className='pb-24' />
+            <TouchableOpacity disabled={isLoading || isLoadingLocal} onPress={() => onCheckout()}
+
+                className={classNames(
+                    'bg-primary-500 w-[90%] self-center h-14 rounded-full justify-center items-center absolute bottom-5',
+                    { 'opacity-50': (isLoading || isLoadingLocal) })}>
+
+                {
+                    (isLoading || isLoadingLocal)
+                        ?
+                        <ActivityIndicator color={colors.base.light} />
+                        :
+                        <Text className='text-base-light font-karla500Medium text-lg'>Finalizar pedido</Text>
+                }
+
             </TouchableOpacity>
         </>
     );
 };
 
-const styles = StyleSheet.create({
-    totalsContainer: {
-        margin: 20,
-        paddingTop: 10,
-        borderColor: 'gainsboro',
-        borderTopWidth: 1,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 2,
-    },
-    text: {
-        fontSize: 16,
-        color: 'gray',
-    },
-    textBold: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
 
-    button: {
-        position: 'absolute',
-        backgroundColor: 'black',
-        bottom: 30,
-        width: '90%',
-        alignSelf: 'center',
-        padding: 20,
-        borderRadius: 100,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: '500',
-        fontSize: 16,
-    },
-});
-
-export  {ShoppingCart};
+export { ShoppingCart };
